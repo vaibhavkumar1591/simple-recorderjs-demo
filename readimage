@@ -1,0 +1,40 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu May 16 22:03:01 2019
+
+@author: Bittu
+"""
+# import the necessary packages
+import numpy as np
+import urllib.request
+import cv2
+from imutils import paths
+
+ 
+# METHOD #1: OpenCV, NumPy, and urllib
+def url_to_image(url):
+	# download the image, convert it to a NumPy array, and then read
+	# it into OpenCV format
+	resp = urllib.request.urlopen(url)
+	image = np.asarray(bytearray(resp.read()), dtype="uint8")
+	image = cv2.imdecode(image, cv2.IMREAD_COLOR)
+ 
+	# return the image
+	return image
+
+#print(url_to_image("https://firebasestorage.googleapis.com/v0/b/buzzycodes2.appspot.com/o/influencer-uploads%2F769991B8-2A39-4DE8-BDFA-8580165F5E86?alt=media&token=a706aa56-0b4a-46e9-9791-7b21dda059bd"))
+
+def dhash(image, hashSize=8):
+	# resize the input image, adding a single column (width) so we
+	# can compute the horizontal gradient
+	resized = cv2.resize(image, (hashSize + 1, hashSize))
+ 
+	# compute the (relative) horizontal gradient between adjacent
+	# column pixels
+	diff = resized[:, 1:] > resized[:, :-1]
+ 
+	# convert the difference image to a hash
+	return sum([2 ** i for (i, v) in enumerate(diff.flatten()) if v])
+
+res=dhash(url_to_image("https://firebasestorage.googleapis.com/v0/b/buzzycodes2.appspot.com/o/influencer-uploads%2F769991B8-2A39-4DE8-BDFA-8580165F5E86?alt=media&token=a706aa56-0b4a-46e9-9791-7b21dda059bd"))
+print(res)
